@@ -19,20 +19,21 @@
             background-color: var(--bg);
             background-image: radial-gradient(circle at 50% -20%, #1e293b, #05070a);
             color: var(--text-primary);
-            font-family: 'Noto Sans Devanagari', sans-serif;
+            font-family: 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif;
             margin: 0;
             padding: 0;
+            line-height: 1.6;
         }
 
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
 
         nav { padding: 30px 0; border-bottom: 1px solid var(--border); margin-bottom: 60px; }
-        .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: 2px; color: var(--accent); }
+        .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
 
         .hero { margin-bottom: 80px; text-align: center; padding: 40px 0; }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero h1 { font-size: 3.5rem; margin: 0; font-weight: 700; }
+        .hero p { color: var(--text-secondary); font-size: 1.2rem; margin-top: 10px; }
 
-        /* The dynamic grid */
         #feed-grid { display: flex; flex-direction: column; gap: 25px; }
 
         .blog-card {
@@ -41,7 +42,7 @@
             border: 1px solid var(--border);
             border-radius: 28px;
             padding: 40px;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             text-decoration: none;
             color: inherit;
             display: block;
@@ -51,13 +52,14 @@
             transform: translateY(-5px);
             border-color: var(--accent);
             background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
-        .post-date { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px; display: block; }
-        h2 { margin: 0 0 10px 0; font-size: 1.8rem; }
-        p { color: var(--text-secondary); margin: 0; }
+        .post-date { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 12px; display: block; font-weight: 700; }
+        h2 { margin: 0 0 12px 0; font-size: 1.9rem; line-height: 1.3; }
+        p.excerpt { color: var(--text-secondary); margin: 0; font-size: 1.1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        footer { text-align: center; padding: 100px 0; color: var(--text-secondary); }
+        footer { text-align: center; padding: 100px 0 60px; color: var(--text-secondary); border-top: 1px solid var(--border); margin-top: 100px; }
     </style>
 </head>
 <body>
@@ -71,33 +73,36 @@
         </section>
 
         <main id="feed-grid">
-            <p>लेखहरू लोड हुँदैछन्...</p>
+            <p>लोड हुँदैछ...</p>
         </main>
 
-        <footer>&copy; 2026 आयुष आचार्य</footer>
+        <footer>
+            AYUSH ACHARYA &copy; 2026 | लेखिएका शब्दहरू कहिल्यै पुराना हुँदैनन्।
+        </footer>
     </div>
 
     <script>
         async function fetchPosts() {
             const grid = document.getElementById('feed-grid');
             try {
+                // Fetching the JSON database
                 const response = await fetch('posts.json');
+                if(!response.ok) throw new Error("JSON file not found");
                 const posts = await response.json();
                 
-                grid.innerHTML = ''; // Clear the loading text
+                grid.innerHTML = ''; 
 
                 posts.forEach(post => {
-                    const card = `
+                    grid.innerHTML += `
                         <a href="post.html?name=${post.id}" class="blog-card">
                             <span class="post-date">${post.date}</span>
                             <h2>${post.title}</h2>
-                            <p>${post.excerpt}</p>
+                            <p class="excerpt">${post.excerpt}</p>
                         </a>
                     `;
-                    grid.innerHTML += card;
                 });
             } catch (e) {
-                grid.innerHTML = "<p>लेखहरू लोड गर्न सकिएन। कृपया posts.json फाइल जाँच गर्नुहोस्।</p>";
+                grid.innerHTML = `<p style="color: #ff4444;">Error loading posts: ${e.message}</p>`;
             }
         }
         fetchPosts();
