@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>लेख पढ्नुहोस्</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --text: #f1f5f9; --accent: #38bdf8; --dim: #94a3b8; }
+        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans Devanagari', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; line-height: 1.8; }
+        nav, #post-content { max-width: 700px; width: 100%; }
+        .back-link { text-decoration: none; color: var(--accent); font-weight: 500; display: block; margin-bottom: 40px; }
+        h1 { font-size: 2.2rem; margin-bottom: 10px; color: #fff; }
+        .meta { color: var(--dim); margin-bottom: 30px; font-style: italic; }
+        p { margin-bottom: 25px; font-size: 1.15rem; color: rgba(241, 245, 249, 0.9); }
+        footer { margin-top: 50px; color: var(--dim); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <nav><a href="index.html" class="back-link">← मुख्य पृष्ठमा फर्कनुहोस्</a></nav>
+
+    <div id="post-content">
+        <p>लोड हुँदैछ...</p>
+    </div>
+
+    <footer>&copy; 2026 आयुष आचार्य</footer>
+
+    <script>
+        // JavaScript logic to load the file
+        async function loadPost() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postName = urlParams.get('name');
+            const container = document.getElementById('post-content');
+
+            if (postName) {
+                try {
+                    const response = await fetch(`posts/${postName}.html`);
+                    if (response.ok) {
+                        const html = await response.text();
+                        container.innerHTML = html;
+                    } else {
+                        container.innerHTML = "<h2>लेख भेटिएन।</h2>";
+                    }
+                } catch (error) {
+                    container.innerHTML = "<h2>त्रुटि भयो।</h2>";
+                }
+            }
+        }
+        loadPost();
+    </script>
+</body>
+</html>
