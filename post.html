@@ -4,104 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>लेख पढ्नुहोस्</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #05070a;
-            --text-main: #e2e8f0;
-            --text-dim: #94a3b8;
-            --accent: #38bdf8;
-            --border: rgba(255, 255, 255, 0.07);
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Noto Sans Devanagari', sans-serif;
-            margin: 0;
-            line-height: 1.9;
-        }
-
-        /* Top Progress Indicator */
-        .progress-bar {
-            position: fixed;
-            top: 0; left: 0; height: 3px;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            width: 100%;
-            z-index: 100;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 80px 20px;
-        }
-
-        nav { margin-bottom: 60px; }
-
-        .back-btn {
-            text-decoration: none;
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: color 0.3s;
-        }
-
-        .back-btn:hover { color: var(--accent); }
-
-        /* Typography Styling */
-        h1 {
-            font-size: 2.8rem;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .meta {
-            color: var(--accent);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.9rem;
-            margin-bottom: 50px;
-            display: block;
-            border-left: 2px solid var(--accent);
-            padding-left: 15px;
-        }
-
-        #post-content p {
-            font-size: 1.25rem;
-            margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.85);
-            letter-spacing: 0.01rem;
-        }
-
-        footer {
-            margin-top: 80px;
-            padding-top: 40px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--text-dim);
-        }
+        :root { --bg: #05070a; --text: #e2e8f0; --accent: #38bdf8; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Noto Sans Devanagari', sans-serif; margin: 0; line-height: 1.9; }
+        .container { max-width: 700px; margin: 0 auto; padding: 60px 20px; }
+        nav { margin-bottom: 40px; }
+        .back-btn { text-decoration: none; color: var(--accent); font-weight: bold; }
+        #post-content h1 { font-size: 2.5rem; color: #fff; }
+        .meta { color: var(--accent); display: block; margin-bottom: 30px; font-style: italic; }
+        p { margin-bottom: 25px; font-size: 1.2rem; }
+        .error-msg { color: #ff4444; border: 1px solid #ff4444; padding: 20px; border-radius: 10px; background: rgba(255,0,0,0.1); }
     </style>
 </head>
 <body>
 
-    <div class="progress-bar"></div>
-
     <div class="container">
-        <nav>
-            <a href="index.html" class="back-btn">← सबै लेखहरू</a>
-        </nav>
-
+        <nav><a href="index.html" class="back-btn">← सबै लेखहरू</a></nav>
         <main id="post-content">
-            <p>लोड हुँदैछ...</p>
+            <p>लोड हुँदैछ (Loading)...</p>
         </main>
-
-        <footer>
-            &copy; 2026 आयुष आचार्य
-        </footer>
     </div>
 
     <script>
@@ -110,21 +32,32 @@
             const postName = urlParams.get('name');
             const container = document.getElementById('post-content');
 
-            if (postName) {
-                try {
-                    const response = await fetch(`posts/${postName}.html`);
-                    if (response.ok) {
-                        const html = await response.text();
-                        container.innerHTML = html;
-                        // Set the page title to the blog title
-                        const postTitle = container.querySelector('h1').innerText;
-                        document.title = postTitle + " | मेरो डायरी";
-                    } else {
-                        container.innerHTML = "<h1>४०४</h1><p>लेख भेटिएन।</p>";
-                    }
-                } catch (error) {
-                    container.innerHTML = "<p>त्रुटि भयो।</p>";
+            if (!postName) {
+                container.innerHTML = "<div class='error-msg'>कुनै पनि लेख छानिएको छैन। (No post selected)</div>";
+                return;
+            }
+
+            try {
+                // IMPORTANT: Path must be exactly 'posts/filename.html'
+                const response = await fetch('posts/' + postName + '.html');
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class='error-msg'>
+                            <strong>लेख भेटिएन (404 Error)</strong><br>
+                            जाँच गर्नुहोस्: के तपाइँको 'posts' फोल्डर भित्र <b>${postName}.html</b> फाइल छ?
+                        </div>`;
                 }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class='error-msg'>
+                        <strong>सुरक्षा त्रुटि (Security Error)</strong><br>
+                        यदि तपाइँ यो फाइल सिधै कम्प्युटरमा खोल्दै हुनुहुन्छ भने, केही ब्राउजरले यसलाई ब्लक गर्छन्। 
+                        यसलाई <b>GitHub</b> मा अपलोड गरेपछि वा <b>VS Code Live Server</b> मा चलाउँदा यो ठिक हुन्छ।
+                    </div>`;
             }
         }
         loadPost();
